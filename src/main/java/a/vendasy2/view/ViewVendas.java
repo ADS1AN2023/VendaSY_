@@ -8,11 +8,15 @@ import a.vendasy2.controller.ControllerCliente;
 import a.vendasy2.controller.ControllerProdutos;
 import a.vendasy2.controller.ControllerVendas;
 import a.vendasy2.controller.ControllerVendasCliente;
+import a.vendasy2.controller.ControllerVendasProdutos;
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 import a.vendasy2.model.ModelCliente;
 import a.vendasy2.model.ModelProdutos;
+import a.vendasy2.model.ModelVendas;
 import a.vendasy2.model.ModelVendasCliente;
+import a.vendasy2.model.ModelVendasProdutos;
+import a.vendasy2.util.SYDatas;
 import javax.swing.JOptionPane;
 
 /**
@@ -30,7 +34,11 @@ public class ViewVendas extends javax.swing.JFrame {
     ArrayList<ModelVendasCliente> listaModelVendasCliente = new ArrayList<>();
     ControllerVendasCliente controllerVendasCliente = new ControllerVendasCliente();
     ControllerVendas controllerVendas = new ControllerVendas();
-    
+    ModelVendas modelVendas = new ModelVendas();
+    SYDatas syDatas = new SYDatas();
+    ControllerVendasProdutos controllerVendasProdutos = new ControllerVendasProdutos();
+    ModelVendasProdutos modelVendasProdutos = new ModelVendasProdutos();
+    ArrayList<ModelVendasProdutos> listaModelVendasProdutos = new ArrayList<>();
 
     /**
      * Creates new form ViewVendas
@@ -174,6 +182,11 @@ public class ViewVendas extends javax.swing.JFrame {
         jbCancelar.setText("Cancelar");
 
         jbSalvar.setText("Salvar");
+        jbSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbSalvarActionPerformed(evt);
+            }
+        });
 
         jbNovo.setText("Novo");
         jbNovo.addActionListener(new java.awt.event.ActionListener() {
@@ -441,14 +454,14 @@ public class ViewVendas extends javax.swing.JFrame {
             }
             modelo.addRow(new Object[]{
                 modelProdutos.getIdProduto(),
-                 modelProdutos.getProNome(),
-                 jtfQuantidade.getText(),
-                 modelProdutos.getProValor(),
+                modelProdutos.getProNome(),
+                jtfQuantidade.getText(),
+                modelProdutos.getProValor(),
                 quantidade * modelProdutos.getProValor()
 
             });
             somarValorTotalProdutos();
-            
+
         }
     }                                           
 
@@ -461,6 +474,48 @@ public class ViewVendas extends javax.swing.JFrame {
         // TODO add your handling code here:
         limparFormulario();
     }                                      
+
+    private void jbSalvarActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        // TODO add your handling code here:
+        int codigoVenda = 0;
+        //Nova lista de produtos caso tenha algum lixo na memória
+        listaModelVendasProdutos = new ArrayList<>();
+        modelVendas.setCliente(Integer.parseInt(jtfCodigoCliente.getText()));
+        try {
+            modelVendas.setVenData(syDatas.converterDataParaDateUS(new java.util.Date(System.currentTimeMillis())));
+        } catch (Exception e) {
+        }
+        modelVendas.setVenValorLiquido(Double.parseDouble(jtfValorTotal.getText()));
+        modelVendas.setVenValorBruto(Double.parseDouble(jtfValorTotal.getText()) + Double.parseDouble(jtfDesconto.getText()));
+        modelVendas.setVenDesconto(Double.parseDouble(jtfDesconto.getText()));
+
+        //Ssalvar venda
+        codigoVenda = controllerVendas.salvarVendasController(modelVendas);
+        if (codigoVenda > 0) {
+            JOptionPane.showMessageDialog(this, "Venda salva com sucesso!");
+        } else {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar venda!");
+        }
+
+        int cont = jtProdutosVenda.getRowCount();
+        for (int i = 0; i < cont; i++) {
+            modelVendasProdutos = new ModelVendasProdutos();
+            modelVendasProdutos.setProduto((int) jtProdutosVenda.getValueAt(i, 0));
+            modelVendasProdutos.setVendas(codigoVenda);
+            modelVendasProdutos.setVenProValor((double) jtProdutosVenda.getValueAt(i, 3));
+            modelVendasProdutos.setVenProQuantidade(Integer.parseInt(jtProdutosVenda.getValueAt(i, 2).toString()));
+            listaModelVendasProdutos.add(modelVendasProdutos);
+        }
+        //Salvar os produtos da venda
+        if (controllerVendasProdutos.salvarVendasProdutosController(listaModelVendasProdutos)) {
+            JOptionPane.showMessageDialog(this, "Produtos da venda salvo com sucesso!");
+            carregarVendas();
+            limparFormulario();
+        } else {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar produtos!");
+        }
+
+    }                                        
 
     /**
      * @param args the command line arguments
@@ -522,35 +577,35 @@ public class ViewVendas extends javax.swing.JFrame {
     /**
      * Aplica descontos ao valor final de vendas
      */
-    private void aplicarDescontos(){
+    private void aplicarDescontos() {
         jtfValorTotal.setText(String.valueOf(
-                Double.parseDouble(jtfValorTotal.getText())- Double.parseDouble(jtfDesconto.getText())));
+                Double.parseDouble(jtfValorTotal.getText()) - Double.parseDouble(jtfDesconto.getText())));
     }
-    
-    private void preencherCodigoClientePeloCombobox(){
+
+    private void preencherCodigoClientePeloCombobox() {
         modelCliente = controllerCliente.getClienteController(jcbNomeCliente.getSelectedItem().toString());
-            jtfCodigoCliente.setText(String.valueOf(modelCliente.getIdCliente()));        
+        jtfCodigoCliente.setText(String.valueOf(modelCliente.getIdCliente()));
     }
-    
-    private void preencherCodigoProdutoPeloCombobox(){
+
+    private void preencherCodigoProdutoPeloCombobox() {
         modelProdutos = controllerProdutos.retornarProdutoControllerS(jcbNomeProduto.getSelectedItem().toString());
-            jtfCodigoProduto.setText(String.valueOf(modelProdutos.getIdProduto()));
+        jtfCodigoProduto.setText(String.valueOf(modelProdutos.getIdProduto()));
     }
-    
+
     /**
      * Soma todos os produtos da venda
      */
-    private void somarValorTotalProdutos(){
+    private void somarValorTotalProdutos() {
         double soma = 0, valor;
-        int cont=jtProdutosVenda.getRowCount();
-        for(int i=0; i<cont; i++){
-            valor = (double) jtProdutosVenda.getValueAt(i,4);
-            soma = soma+valor;
+        int cont = jtProdutosVenda.getRowCount();
+        for (int i = 0; i < cont; i++) {
+            valor = (double) jtProdutosVenda.getValueAt(i, 4);
+            soma = soma + valor;
         }
         jtfValorTotal.setText(String.valueOf(soma));
         aplicarDescontos();
     }
-    
+
     private void carregarVendas() {
         DefaultTableModel modelo = (DefaultTableModel) jtVendas.getModel();
         listaModelVendasCliente = controllerVendasCliente.getListaVendasClienteController();
@@ -568,13 +623,13 @@ public class ViewVendas extends javax.swing.JFrame {
     /**
      * Limpar formulário de venda
      */
-    private void limparFormulario(){
+    private void limparFormulario() {
         jtfQuantidade.setText("");
         jtfDesconto.setText("");
         jtfValorTotal.setText("");
         DefaultTableModel modelo = (DefaultTableModel) jtProdutosVenda.getModel();
         modelo.setNumRows(0);
-        
+
     }
 
     // Variables declaration - do not modify                     
@@ -612,3 +667,4 @@ public class ViewVendas extends javax.swing.JFrame {
     private javax.swing.JTextField jtfValorTotal;
     // End of variables declaration                   
 }
+
