@@ -116,7 +116,7 @@ public class DAOProdutos extends ConexaoDAO {
         }
         return modelProdutos;
     }
-    
+
     /**
      * Retornar um produto pelo nome
      *
@@ -185,4 +185,30 @@ public class DAOProdutos extends ConexaoDAO {
         }
         return listaModelProdutos;
     }
+
+    /**
+     * Alterar estoque de produtos no banco
+     * @param pListaModelProdutos
+     * @return 
+     */
+    public boolean alterarEstoqueProdutosDAO(ArrayList<ModelProdutos> pListaModelProdutos) {
+        try {
+            this.conectar();
+            for (int i = 0; i < pListaModelProdutos.size(); i++) {
+                this.executarUpdateDeleteSQL(
+                        "UPDATE tbl_produto SET "
+                        + "pro_estoque = '" + pListaModelProdutos.get(i).getProEstoque() + "'"
+                        + "WHERE pk_id_produto = '" + pListaModelProdutos.get(i).getIdProduto() + "'"
+                );
+            }
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            this.fecharConexao();
+        }
+    }
 }
+
