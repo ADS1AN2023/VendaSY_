@@ -95,7 +95,8 @@ public class ViewVendas extends javax.swing.JFrame {
         jbExcluir = new javax.swing.JButton();
         jbAlterar = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Vendas");
         setResizable(false);
 
         jtfCodigoCliente.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -477,17 +478,25 @@ public class ViewVendas extends javax.swing.JFrame {
 
     private void jbSalvarActionPerformed(java.awt.event.ActionEvent evt) {                                         
         // TODO add your handling code here:
-        int codigoVenda = 0;
+        int codigoVenda = 0, codigoProduto = 0;
+        double desconto = 0;
         //Nova lista de produtos caso tenha algum lixo na memória
         listaModelVendasProdutos = new ArrayList<>();
+
+        if (jtfDesconto.getText().equals("")) {
+            desconto = 0;
+        } else {
+            desconto = Double.parseDouble(jtfDesconto.getText());
+        }
         modelVendas.setCliente(Integer.parseInt(jtfCodigoCliente.getText()));
         try {
             modelVendas.setVenData(syDatas.converterDataParaDateUS(new java.util.Date(System.currentTimeMillis())));
         } catch (Exception e) {
         }
         modelVendas.setVenValorLiquido(Double.parseDouble(jtfValorTotal.getText()));
-        modelVendas.setVenValorBruto(Double.parseDouble(jtfValorTotal.getText()) + Double.parseDouble(jtfDesconto.getText()));
-        modelVendas.setVenDesconto(Double.parseDouble(jtfDesconto.getText()));
+        modelVendas.setVenValorBruto(Double.parseDouble(jtfValorTotal.getText()) + desconto);
+
+        modelVendas.setVenDesconto(desconto);
 
         //Ssalvar venda
         codigoVenda = controllerVendas.salvarVendasController(modelVendas);
@@ -499,15 +508,26 @@ public class ViewVendas extends javax.swing.JFrame {
 
         int cont = jtProdutosVenda.getRowCount();
         for (int i = 0; i < cont; i++) {
+            codigoProduto = (int) jtProdutosVenda.getValueAt(i, 0);
             modelVendasProdutos = new ModelVendasProdutos();
-            modelVendasProdutos.setProduto((int) jtProdutosVenda.getValueAt(i, 0));
+            modelProdutos = new ModelProdutos();
+            modelVendasProdutos.setProduto(codigoProduto);
             modelVendasProdutos.setVendas(codigoVenda);
             modelVendasProdutos.setVenProValor((double) jtProdutosVenda.getValueAt(i, 3));
             modelVendasProdutos.setVenProQuantidade(Integer.parseInt(jtProdutosVenda.getValueAt(i, 2).toString()));
+            //Produto
+            modelProdutos.setIdProduto(codigoProduto);
+            //Pegando o estoque e diminuindo os produtos da venda
+            modelProdutos.setProEstoque(controllerProdutos.retornarProdutoController(codigoProduto).getProEstoque()
+                    - Integer.parseInt(jtProdutosVenda.getValueAt(i, 2).toString()));
+
             listaModelVendasProdutos.add(modelVendasProdutos);
+            listaModelProdutos.add(modelProdutos);
         }
         //Salvar os produtos da venda
         if (controllerVendasProdutos.salvarVendasProdutosController(listaModelVendasProdutos)) {
+            //Alterar o estoque de produtos
+            controllerProdutos.alterarEstoqueProdutoController(listaModelProdutos);
             JOptionPane.showMessageDialog(this, "Produtos da venda salvo com sucesso!");
             carregarVendas();
             limparFormulario();
@@ -578,8 +598,12 @@ public class ViewVendas extends javax.swing.JFrame {
      * Aplica descontos ao valor final de vendas
      */
     private void aplicarDescontos() {
-        jtfValorTotal.setText(String.valueOf(
-                Double.parseDouble(jtfValorTotal.getText()) - Double.parseDouble(jtfDesconto.getText())));
+        try {
+            jtfValorTotal.setText(String.valueOf(
+                    Double.parseDouble(jtfValorTotal.getText()) - Double.parseDouble(jtfDesconto.getText())));
+        } catch (NumberFormatException e) {
+
+        }
     }
 
     private void preencherCodigoClientePeloCombobox() {
@@ -666,5 +690,7 @@ public class ViewVendas extends javax.swing.JFrame {
     private javax.swing.JTextField jtfQuantidade;
     private javax.swing.JTextField jtfValorTotal;
     // End of variables declaration                   
+}
+        
 }
 
