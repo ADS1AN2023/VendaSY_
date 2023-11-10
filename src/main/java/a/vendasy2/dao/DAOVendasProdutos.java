@@ -157,7 +157,7 @@ public class DAOVendasProdutos extends ConexaoDAO {
             return this.executarUpdateDeleteSQL(
                     "DELETE FROM tbl_vendas_produtos "
                     + " WHERE "
-                    + "pk_id_venda_produto = '" + pIdVendaProduto + "'"
+                    + "fk_vendas = '" + pIdVendaProduto + "'"
                     + ";"
             );
         } catch (Exception e) {
@@ -186,8 +186,8 @@ public class DAOVendasProdutos extends ConexaoDAO {
                         + "ven_pro_valor,"
                         + "ven_pro_quantidade"
                         + ") VALUES ("
+                        + "'" + pListaModelVendasProdutos.get(i).getProduto() + "',"
                         + "'" + pListaModelVendasProdutos.get(i).getVendas() + "',"
-                        + "'" + pListaModelVendasProdutos.get(i).getProduto()+ "',"
                         + "'" + pListaModelVendasProdutos.get(i).getVenProValor() + "',"
                         + "'" + pListaModelVendasProdutos.get(i).getVenProQuantidade() + "'"
                         + ");"
@@ -202,3 +202,4 @@ public class DAOVendasProdutos extends ConexaoDAO {
         }
     }
 }
+
