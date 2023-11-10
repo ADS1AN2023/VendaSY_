@@ -6,6 +6,7 @@ package a.vendasy2.view;
 
 import a.vendasy2.controller.ControllerCliente;
 import a.vendasy2.controller.ControllerProdutos;
+import a.vendasy2.controller.ControllerProdutosVendasProdutos;
 import a.vendasy2.controller.ControllerVendas;
 import a.vendasy2.controller.ControllerVendasCliente;
 import a.vendasy2.controller.ControllerVendasProdutos;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 import a.vendasy2.model.ModelCliente;
 import a.vendasy2.model.ModelProdutos;
+import a.vendasy2.model.ModelProdutosVendasProdutos;
 import a.vendasy2.model.ModelVendas;
 import a.vendasy2.model.ModelVendasCliente;
 import a.vendasy2.model.ModelVendasProdutos;
@@ -39,6 +41,9 @@ public class ViewVendas extends javax.swing.JFrame {
     ControllerVendasProdutos controllerVendasProdutos = new ControllerVendasProdutos();
     ModelVendasProdutos modelVendasProdutos = new ModelVendasProdutos();
     ArrayList<ModelVendasProdutos> listaModelVendasProdutos = new ArrayList<>();
+    ControllerProdutosVendasProdutos controllerProdutosVendasProdutos = new ControllerProdutosVendasProdutos();
+    ModelProdutosVendasProdutos modelProdutosVendasProdutos = new ModelProdutosVendasProdutos();
+    ArrayList<ModelProdutosVendasProdutos> listaModelProdutosVendasProdutos = new ArrayList<>();
 
     /**
      * Creates new form ViewVendas
@@ -430,10 +435,28 @@ public class ViewVendas extends javax.swing.JFrame {
     private void jbExcluirActionPerformed(java.awt.event.ActionEvent evt) {                                          
         // TODO add your handling code here:
         int linha = jtVendas.getSelectedRow();
-        int codigo = (int) jtVendas.getValueAt(linha, 0);
-        if (controllerVendas.excluirVendasController(codigo)) {
-            JOptionPane.showMessageDialog(this, "Venda excluida com sucesso!");
-            carregarVendas();
+        int codigoVenda = (int) jtVendas.getValueAt(linha, 0);
+        listaModelProdutos = new ArrayList<>();
+        //buscando no banco todos produtos necessários e adicionando na lista
+        listaModelProdutosVendasProdutos = controllerProdutosVendasProdutos.getListaProdutosVendasProdutosController(codigoVenda);
+        for (int i = 0; i < listaModelProdutosVendasProdutos.size(); i++) {
+            modelProdutos = new ModelProdutos();
+            modelProdutos.setIdProduto(listaModelProdutosVendasProdutos.get(i).getModelProdutos().getIdProduto());
+            //Adicionando no estoque a minha quantidade de estoque + a minha quantidade vendida
+            modelProdutos.setProEstoque(
+                    listaModelProdutosVendasProdutos.get(i).getModelProdutos().getProEstoque()
+                    + listaModelProdutosVendasProdutos.get(i).getModelVendasProdutos().getVenProQuantidade());
+            listaModelProdutos.add(modelProdutos);
+        }
+        if (controllerProdutos.alterarEstoqueProdutoController(listaModelProdutos)) {
+            controllerVendasProdutos.excluirVendasProdutosController(codigoVenda);
+
+            if (controllerVendas.excluirVendasController(codigoVenda)) {
+                JOptionPane.showMessageDialog(this, "Venda excluida com sucesso!");
+                this.carregarVendas();
+            } else {
+                JOptionPane.showMessageDialog(this, "Erro ao excluir a venda");
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Erro ao excluir a venda");
         }
@@ -634,6 +657,7 @@ public class ViewVendas extends javax.swing.JFrame {
         DefaultTableModel modelo = (DefaultTableModel) jtVendas.getModel();
         listaModelVendasCliente = controllerVendasCliente.getListaVendasClienteController();
         int cont = listaModelVendasCliente.size();
+        modelo.setNumRows(0);
         for (int i = 0; i < cont; i++) {
             modelo.addRow(new Object[]{
                 listaModelVendasCliente.get(i).getModelVendas().getIdVenda(),
@@ -690,7 +714,5 @@ public class ViewVendas extends javax.swing.JFrame {
     private javax.swing.JTextField jtfQuantidade;
     private javax.swing.JTextField jtfValorTotal;
     // End of variables declaration                   
-}
-        
 }
 
