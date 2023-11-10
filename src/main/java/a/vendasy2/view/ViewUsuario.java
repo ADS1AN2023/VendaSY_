@@ -405,3 +405,4 @@ public class ViewUsuario extends javax.swing.JFrame {
     private javax.swing.JTextField jtfSenha;
     // End of variables declaration                   
 }
+
