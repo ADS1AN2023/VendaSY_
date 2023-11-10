@@ -190,6 +190,7 @@ public class ViewVendas extends javax.swing.JFrame {
         jbCancelar.setText("Cancelar");
 
         jbSalvar.setText("Salvar");
+        jbSalvar.setEnabled(false);
         jbSalvar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jbSalvarActionPerformed(evt);
@@ -513,7 +514,8 @@ public class ViewVendas extends javax.swing.JFrame {
 
     private void jbNovoActionPerformed(java.awt.event.ActionEvent evt) {                                       
         // TODO add your handling code here:
-        alterarSalvar = "novo";
+        jbSalvar.setEnabled(true);
+        alterarSalvar = "salvar";
         limparFormulario();
     }                                      
 
@@ -576,7 +578,7 @@ public class ViewVendas extends javax.swing.JFrame {
             if (controllerVendasProdutos.salvarVendasProdutosController(listaModelVendasProdutos)) {
                 //Alterar o estoque de produtos
                 controllerProdutos.alterarEstoqueProdutoController(listaModelProdutos);
-                JOptionPane.showMessageDialog(this, "Produtos da venda salvo com sucesso!");
+//                JOptionPane.showMessageDialog(this, "Produtos da venda salvo com sucesso!");
                 carregarVendas();
                 limparFormulario();
             } else {
@@ -603,7 +605,7 @@ public class ViewVendas extends javax.swing.JFrame {
             if(controllerVendasProdutos.excluirVendasProdutosController(codigoVenda)){
 
 
-                JOptionPane.showMessageDialog(this, "Venda excluida com sucesso!");
+//                JOptionPane.showMessageDialog(this, "Venda excluida com sucesso!");
                 this.carregarVendas();
             } else {
                 JOptionPane.showMessageDialog(this, "Erro ao excluir a venda");
@@ -639,7 +641,7 @@ public class ViewVendas extends javax.swing.JFrame {
             }
             //salvar os produtos da venda
             if(controllerVendasProdutos.salvarVendasProdutosController(listaModelVendasProdutos)){
-                JOptionPane.showMessageDialog(this, "Produtos da venda salvos com sucesso!");
+//                JOptionPane.showMessageDialog(this, "Produtos da venda salvos com sucesso!");
                 carregarVendas();
                 limparFormulario();
             }else{
@@ -647,11 +649,14 @@ public class ViewVendas extends javax.swing.JFrame {
             }
             
         }
-
+            jbSalvar.setEnabled(false);
     }                                        
 
     private void jbAlterarActionPerformed(java.awt.event.ActionEvent evt) {                                          
         // TODO add your handling code here:
+        //Habilitar botão salvar para alterar
+        jbSalvar.setEnabled(true);
+        //Setar variavel alterar salvar para alterar
         alterarSalvar = "alterar";
         int linha = jtVendas.getSelectedRow();
         int codigoVenda = (int) jtVendas.getValueAt(linha, 0);
@@ -841,4 +846,3 @@ public class ViewVendas extends javax.swing.JFrame {
     private javax.swing.JTextField jtfValorTotal;
     // End of variables declaration                   
 }
-
