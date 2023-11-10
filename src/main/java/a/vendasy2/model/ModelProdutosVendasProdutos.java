@@ -40,3 +40,4 @@ public class ModelProdutosVendasProdutos {
         this.modelVendasProdutos = modelVendasProdutos;
     }
 }
+
