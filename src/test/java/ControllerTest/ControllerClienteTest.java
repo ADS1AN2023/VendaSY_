@@ -2,7 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package ControllerTest;
+
+/**
+ *
+ * @author jose_
+ */
 import a.vendasy2.controller.ControllerCliente;
 import a.vendasy2.model.ModelCliente;
 import a.vendasy2.dao.DAOCliente;
@@ -15,12 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-/**
- *
- * @author jose_
- */
+
+
 public class ControllerClienteTest {
-     private ControllerCliente controllerCliente;
+
+  private ControllerCliente controllerCliente;
     private DAOCliente daoCliente;
 
     @BeforeEach
@@ -58,4 +61,17 @@ public void testAtualizarClienteController() {
     // Verifique se o método atualizarClienteDAO do mock foi chamado com o cliente correto
     verify(daoCliente).atualizarClienteDAO(cliente);
 }
+
+@Test
+    public void testExcluirClienteController() {
+        int idCliente = 1; // Insira um ID de cliente válido para o teste
+
+        // Configurar o comportamento simulado para o método excluirClienteDAO
+        Mockito.when(daoCliente.excluirClienteDAO(idCliente)).thenReturn(true);
+
+        boolean resultado = controllerCliente.excluirClienteController(idCliente);
+
+        // Verificar se o resultado é verdadeiro para indicar que o cliente foi excluído com sucesso
+        assertTrue(resultado);
+    }
 }
