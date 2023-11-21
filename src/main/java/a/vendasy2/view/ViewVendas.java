@@ -520,7 +520,7 @@ public class ViewVendas extends javax.swing.JFrame {
     }                                      
 
     private void jbSalvarActionPerformed(java.awt.event.ActionEvent evt) {                                         
-        // TODO add your handling code here:
+          // TODO add your handling code here:
         int codigoVenda = 0, codigoProduto = 0;
         double desconto = 0;
         //Nova lista de produtos caso tenha algum lixo na memória
@@ -548,105 +548,10 @@ public class ViewVendas extends javax.swing.JFrame {
         modelVendas.setVenDesconto(desconto);
 
         if (alterarSalvar.equals("salvar")) {
-            //salva
-            codigoVenda = controllerVendas.salvarVendasController(modelVendas);
-            if (codigoVenda > 0) {
-                JOptionPane.showMessageDialog(this, "Venda salva com sucesso!");
-            } else {
-                JOptionPane.showMessageDialog(this, "Erro ao salvar venda!");
-            }
-
-            int cont = jtProdutosVenda.getRowCount();
-            for (int i = 0; i < cont; i++) {
-                codigoProduto = (int) jtProdutosVenda.getValueAt(i, 0);
-                modelVendasProdutos = new ModelVendasProdutos();
-                modelProdutos = new ModelProdutos();
-                modelVendasProdutos.setProduto(codigoProduto);
-                modelVendasProdutos.setVendas(codigoVenda);
-                modelVendasProdutos.setVenProValor((double) jtProdutosVenda.getValueAt(i, 3));
-                modelVendasProdutos.setVenProQuantidade(Integer.parseInt(jtProdutosVenda.getValueAt(i, 2).toString()));
-                //Produto
-                modelProdutos.setIdProduto(codigoProduto);
-                //Pegando o estoque e diminuindo os produtos da venda
-                modelProdutos.setProEstoque(controllerProdutos.retornarProdutoController(codigoProduto).getProEstoque()
-                        - Integer.parseInt(jtProdutosVenda.getValueAt(i, 2).toString()));
-
-                listaModelVendasProdutos.add(modelVendasProdutos);
-                listaModelProdutos.add(modelProdutos);
-            }
-            //Salvar os produtos da venda
-            if (controllerVendasProdutos.salvarVendasProdutosController(listaModelVendasProdutos)) {
-                //Alterar o estoque de produtos
-                controllerProdutos.alterarEstoqueProdutoController(listaModelProdutos);
-//                JOptionPane.showMessageDialog(this, "Produtos da venda salvo com sucesso!");
-                carregarVendas();
-                limparFormulario();
-            } else {
-                JOptionPane.showMessageDialog(this, "Erro ao salvar produtos!");
-            }
-        } else {
+          salvarAction();
+        } else { 
             //altera
-            //INICIO RETORNAR PARA O ESTOQUE E EXCLUIR PRODUTOS DA VENDA
-            int linha = jtVendas.getSelectedRow();
-       codigoVenda = (int) jtVendas.getValueAt(linha, 0);
-        listaModelProdutos = new ArrayList<>();
-        //buscando no banco todos produtos necessários e adicionando na lista
-        listaModelProdutosVendasProdutos = controllerProdutosVendasProdutos.getListaProdutosVendasProdutosController(codigoVenda);
-        for (int i = 0; i < listaModelProdutosVendasProdutos.size(); i++) {
-            modelProdutos = new ModelProdutos();
-            modelProdutos.setIdProduto(listaModelProdutosVendasProdutos.get(i).getModelProdutos().getIdProduto());
-            //Adicionando no estoque a minha quantidade de estoque + a minha quantidade vendida
-            modelProdutos.setProEstoque(
-                    listaModelProdutosVendasProdutos.get(i).getModelProdutos().getProEstoque()
-                    + listaModelProdutosVendasProdutos.get(i).getModelVendasProdutos().getVenProQuantidade());
-            listaModelProdutos.add(modelProdutos);
-        }
-        if (controllerProdutos.alterarEstoqueProdutoController(listaModelProdutos)) {
-            if(controllerVendasProdutos.excluirVendasProdutosController(codigoVenda)){
-
-
-//                JOptionPane.showMessageDialog(this, "Venda excluida com sucesso!");
-                this.carregarVendas();
-            } else {
-                JOptionPane.showMessageDialog(this, "Erro ao excluir a venda");
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Erro ao excluir a venda");
-        }
-        //FIM RETORNAR PARA O ESTOQUE E EXCLUIR PRODUTOS DA VENDA
-        
-        if(controllerVendas.atualizarVendasController(modelVendas)){
-            JOptionPane.showMessageDialog(this, "Venda Alterada com sucesso!");
-        }else{
-            JOptionPane.showMessageDialog(this, "Erro ao alterar a venda");
-        }
-        //Adicionar produtos na lista para salvar
-         int cont = jtProdutosVenda.getRowCount();
-            for (int i = 0; i < cont; i++) {
-                codigoProduto = (int) jtProdutosVenda.getValueAt(i, 0);
-                modelVendasProdutos = new ModelVendasProdutos();
-                modelProdutos = new ModelProdutos();
-                modelVendasProdutos.setProduto(codigoProduto);
-                modelVendasProdutos.setVendas(codigoVenda);
-                modelVendasProdutos.setVenProValor((double) jtProdutosVenda.getValueAt(i, 3));
-                modelVendasProdutos.setVenProQuantidade(Integer.parseInt(jtProdutosVenda.getValueAt(i, 2).toString()));
-                //Produto
-                modelProdutos.setIdProduto(codigoProduto);
-                //Pegando o estoque e diminuindo os produtos da venda
-                modelProdutos.setProEstoque(controllerProdutos.retornarProdutoController(codigoProduto).getProEstoque()
-                        - Integer.parseInt(jtProdutosVenda.getValueAt(i, 2).toString()));
-
-                listaModelVendasProdutos.add(modelVendasProdutos);
-                listaModelProdutos.add(modelProdutos);
-            }
-            //salvar os produtos da venda
-            if(controllerVendasProdutos.salvarVendasProdutosController(listaModelVendasProdutos)){
-//                JOptionPane.showMessageDialog(this, "Produtos da venda salvos com sucesso!");
-                carregarVendas();
-                limparFormulario();
-            }else{
-                JOptionPane.showMessageDialog(this, "Erro ao salvar produtos da venda!");
-            }
+           alteraAction();
             
         }
             jbSalvar.setEnabled(false);
@@ -809,6 +714,118 @@ public class ViewVendas extends javax.swing.JFrame {
         modelo.setNumRows(0);
 
     }
+    
+    public void salvarAction(){
+        //salva
+        int codigoProduto=0;
+        int codigoVenda = controllerVendas.salvarVendasController(modelVendas);
+            if (codigoVenda > 0) {
+                JOptionPane.showMessageDialog(this, "Venda salva com sucesso!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Erro ao salvar venda!");
+            }
+
+            int cont = jtProdutosVenda.getRowCount();
+            for (int i = 0; i < cont; i++) {
+                codigoProduto = (int) jtProdutosVenda.getValueAt(i, 0);
+                modelVendasProdutos = new ModelVendasProdutos();
+                modelProdutos = new ModelProdutos();
+                modelVendasProdutos.setProduto(codigoProduto);
+                modelVendasProdutos.setVendas(codigoVenda);
+                modelVendasProdutos.setVenProValor((double) jtProdutosVenda.getValueAt(i, 3));
+                modelVendasProdutos.setVenProQuantidade(Integer.parseInt(jtProdutosVenda.getValueAt(i, 2).toString()));
+                //Produto
+                modelProdutos.setIdProduto(codigoProduto);
+                //Pegando o estoque e diminuindo os produtos da venda
+                modelProdutos.setProEstoque(controllerProdutos.retornarProdutoController(codigoProduto).getProEstoque()
+                        - Integer.parseInt(jtProdutosVenda.getValueAt(i, 2).toString()));
+
+                listaModelVendasProdutos.add(modelVendasProdutos);
+                listaModelProdutos.add(modelProdutos);
+            }
+            //Salvar os produtos da venda
+            if (controllerVendasProdutos.salvarVendasProdutosController(listaModelVendasProdutos)) {
+                //Alterar o estoque de produtos
+                controllerProdutos.alterarEstoqueProdutoController(listaModelProdutos);
+//                JOptionPane.showMessageDialog(this, "Produtos da venda salvo com sucesso!");
+                carregarVendas();
+                limparFormulario();
+            } else {
+                JOptionPane.showMessageDialog(this, "Erro ao salvar produtos!");
+            }
+    }
+    
+    public void alteraAction(){
+  
+            int linha = jtVendas.getSelectedRow();
+        int codigoVenda = (int) jtVendas.getValueAt(linha, 0);
+        listaModelProdutos = new ArrayList<>();
+        //buscando no banco todos produtos necessários e adicionando na lista
+        listaModelProdutosVendasProdutos = controllerProdutosVendasProdutos.getListaProdutosVendasProdutosController(codigoVenda);
+        for (int i = 0; i < listaModelProdutosVendasProdutos.size(); i++) {
+            modelProdutos = new ModelProdutos();
+            modelProdutos.setIdProduto(listaModelProdutosVendasProdutos.get(i).getModelProdutos().getIdProduto());
+            //Adicionando no estoque a minha quantidade de estoque + a minha quantidade vendida
+            modelProdutos.setProEstoque(
+                    listaModelProdutosVendasProdutos.get(i).getModelProdutos().getProEstoque()
+                    + listaModelProdutosVendasProdutos.get(i).getModelVendasProdutos().getVenProQuantidade());
+            listaModelProdutos.add(modelProdutos);
+        }
+        alteraEstoque();
+        //Adicionar produtos na lista para salvar
+         int cont = jtProdutosVenda.getRowCount();
+            for (int i = 0; i < cont; i++) {
+                int codigoProduto = (int) jtProdutosVenda.getValueAt(i, 0);
+                modelVendasProdutos = new ModelVendasProdutos();
+                modelProdutos = new ModelProdutos();
+                modelVendasProdutos.setProduto(codigoProduto);
+                modelVendasProdutos.setVendas(codigoVenda);
+                modelVendasProdutos.setVenProValor((double) jtProdutosVenda.getValueAt(i, 3));
+                modelVendasProdutos.setVenProQuantidade(Integer.parseInt(jtProdutosVenda.getValueAt(i, 2).toString()));
+                //Produto
+                modelProdutos.setIdProduto(codigoProduto);
+                //Pegando o estoque e diminuindo os produtos da venda
+                modelProdutos.setProEstoque(controllerProdutos.retornarProdutoController(codigoProduto).getProEstoque()
+                        - Integer.parseInt(jtProdutosVenda.getValueAt(i, 2).toString()));
+
+                listaModelVendasProdutos.add(modelVendasProdutos);
+                listaModelProdutos.add(modelProdutos);
+            }
+            //salvar os produtos da venda
+            salvarOsProdutos();
+    }
+    
+    public void salvarOsProdutos(){
+                 if(controllerVendasProdutos.salvarVendasProdutosController(listaModelVendasProdutos)){
+//                JOptionPane.showMessageDialog(this, "Produtos da venda salvos com sucesso!");
+                carregarVendas();
+                limparFormulario();
+            }else{
+                JOptionPane.showMessageDialog(this, "Erro ao salvar produtos da venda!");
+            }
+    }
+    
+    private int obterCodigoVendaSelecionada() {
+    int linha = jtVendas.getSelectedRow();
+    return (int) jtVendas.getValueAt(linha, 0);
+}
+    private void alteraEstoque(){
+        if (controllerProdutos.alterarEstoqueProdutoController(listaModelProdutos)) {
+            if(controllerVendasProdutos.excluirVendasProdutosController(obterCodigoVendaSelecionada())){
+
+                this.carregarVendas();
+            } else {
+                JOptionPane.showMessageDialog(this, "Erro ao excluir a venda");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Erro ao excluir a venda");
+        }
+        if(controllerVendas.atualizarVendasController(modelVendas)){
+            JOptionPane.showMessageDialog(this, "Venda Alterada com sucesso!");
+        }else{
+            JOptionPane.showMessageDialog(this, "Erro ao alterar a venda");
+        }
+    }
 
     // Variables declaration - do not modify                     
     private javax.swing.JButton jButton5;
@@ -846,3 +863,4 @@ public class ViewVendas extends javax.swing.JFrame {
     private javax.swing.JTextField jtfValorTotal;
     // End of variables declaration                   
 }
+
